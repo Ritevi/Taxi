@@ -8,9 +8,10 @@ const sequelize = require('./libs/sequelize');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const loadUser = require('./middleware/loadUser');
 const config = require('./config');
+const passport = require('./libs/passport');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var usersRouter = require('./routes/Auth');
 
 var app = express();
 
@@ -38,7 +39,10 @@ app.use(session({
     db: sequelize
   })
 }));
-sequelize.sync();
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.use(loadUser);
 app.use('/', indexRouter);

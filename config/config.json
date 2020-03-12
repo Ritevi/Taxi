@@ -3,11 +3,15 @@
   "env": "development",
   "JWT": "secret",
   "secret": "hi,ksta",
+  "Auth": {
+    "VKONTAKTE_APP_ID": 7356234,
+    "VKONTAKTE_APP_SECRET":"DeuhgWF1SMKKRYipvXfd"
+  },
   "sequelize": {
     "dialect": "mysql",
     "host": "localhost",
     "user": "root",
-    "database": "taxi",
+    "database": "Taxi",
     "password": "LJxiP:p0"
   }
 }
