@@ -35,6 +35,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret:config.get('secret'),
+  resave: false,
+  saveUninitialized: false,
+  maxAge:2 * 24 * 60 * 60 * 1000,
   store: new SequelizeStore({
     db: sequelize
   })
