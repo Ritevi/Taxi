@@ -16,11 +16,11 @@ router.get('/auth/vkontakte',
         // this function will not be called.
     });
 
-router.get('/auth/vkontakte/callback',
-    passport.authenticate('vkontakte', { failureRedirect: '/' }),
+router.get('/auth/vkontakte/callback*',
+    passport.authenticate('vkontakte', { failureRedirect: '/login' }),
     function(req, res) {
         // Successful authentication, redirect home.
-        res.redirect('/');
+        res.redirect('/chat');
     });
 
 module.exports = router;

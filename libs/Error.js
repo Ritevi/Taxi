@@ -1,11 +1,12 @@
 const util = require("util");
 var Sequelize = require('sequelize');
 
-function CustomError(name,code,message) {
+function CustomError(name,code,status,message,) {
     Error.apply(this, arguments);
     Error.captureStackTrace(this, CustomError);
     this.name = name;
     this.code = code;
+    this.status = status||500;
     this.message = message||[name,code].join(" ");
 }
 util.inherits(CustomError, Error);

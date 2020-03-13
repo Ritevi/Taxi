@@ -13,7 +13,7 @@ exports.post = function (req,res,next) {
     User.Registration(username,password,email)
         .then((user)=>{
             if(user){
-                req.session.user = user;
+                req.session.passport = {user};
                 res.status(200);
                 res.send();
             } else {

@@ -13,12 +13,10 @@ User.init({
         type: Sequelize.INTEGER
     },
     username:{
-        type:Sequelize.STRING(16),
-        unique:true,
-        validate:{
-            len:[3,16],
-            is: ["^[A-Za-z0-9-_]+$",'i']
-        }
+        type:Sequelize.STRING(64)
+    },
+    displayName:{
+        type:Sequelize.STRING(64)
     },
     password:{
         type:Sequelize.STRING(64),
@@ -26,13 +24,17 @@ User.init({
             notEmpty:true
         }
     },
+    PhotoUrl:{
+        type:Sequelize.STRING(128),
+    },
+    vkId:{
+        type:Sequelize.INTEGER()
+    },
     email:{
         type:Sequelize.STRING(),
-        allowNull:false,
         unique:true,
         validate:{
-            isEmail:true,
-            notEmpty:true
+            isEmail:true
         }
     },
     createdAt: {
@@ -104,5 +106,31 @@ User.login = async function(email,password){
         throw new CustomError.SeqInCustom(err);
     }
 };
+
+User.findOrCreateByVK = async function(profile){
+    let transaction;
+    try{
+        transaction = await sequelize.transaction();
+        let [user,created] = await User.findOrCreate({
+            where:{
+                    vkId:profile.id,
+                },
+            defaults:{
+                vkId:profile.id,
+                displayName:profile.displayName,
+                PhotoUrl:profile.photos[0].value
+            },transaction});
+        if(user){
+            await transaction.commit();
+            return user;
+        } else {
+            throw new CustomError("AuthError", "NO_USER");
+        }
+    }catch (err) {
+        if(transaction) transaction.rollback();
+        throw new CustomError.SeqInCustom(err);
+    }
+};
+
 
 exports.User = User;

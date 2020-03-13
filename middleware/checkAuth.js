@@ -1,8 +1,8 @@
-var error = require('../models/User').CustomError;
+var error = require('../libs/Error');
 
 module.exports = function (req,res,next) {
-    if (!req.session.user) {
-        return next(new error('middleware',"NO_USER").status(401));
+    if (!req.session.passport) {
+        return next(new error('middleware',"NO_USER",401)); //status 401
     }
     next();
 };
