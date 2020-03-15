@@ -1,5 +1,5 @@
-const User = require('../models/User').User;
-const error = require('../libs/Error');
+const User = require('../../models/User').User;
+const error = require('../../libs/Error');
 
 exports.post = function (req,res,next) {
     const password = req.body.password || '';

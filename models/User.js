@@ -28,7 +28,9 @@ User.init({
         type:Sequelize.STRING(128),
     },
     vkId:{
-        type:Sequelize.INTEGER()
+        type:Sequelize.INTEGER(),
+        unique:true,
+        allowNull:true
     },
     email:{
         type:Sequelize.STRING(),
@@ -72,6 +74,7 @@ User.prototype.asyncValidPassword = async function(password) {
 };
 
 User.Registration = async function(username,password,email) {
+    const t = await sequelize.transaction();
     try {
         let user = await User.findOne({where: {email, username}});
         if (user) {
@@ -79,13 +82,20 @@ User.Registration = async function(username,password,email) {
         } else {
             if (password.length >= 6 && password.length <= 32) {
                 let hash = await User.asyncGenerateHash(password);
-                let createdUser =  await User.create({username:username, password: hash, email:email});
-                return createdUser;
+                let createdUser =  await User.create({username:username, password: hash, email:email},{transaction:t});
+                if(createdUser){
+                    t.commit();
+                    return createdUser;
+                } else {
+                    throw new CustomError("AuthError","USER_NOT_CREATED");
+                }
+
             } else {
                 throw new CustomError("AuthError", "NO_VALID_PASSWORD");
             }
         }
     } catch (err) {
+        t.rollback();
         throw new CustomError.SeqInCustom(err);
     }
 };
@@ -108,9 +118,8 @@ User.login = async function(email,password){
 };
 
 User.findOrCreateByVK = async function(profile){
-    let transaction;
+    const transaction = await sequelize.transaction();
     try{
-        transaction = await sequelize.transaction();
         let [user,created] = await User.findOrCreate({
             where:{
                     vkId:profile.id,
@@ -130,6 +139,20 @@ User.findOrCreateByVK = async function(profile){
         if(transaction) transaction.rollback();
         throw new CustomError.SeqInCustom(err);
     }
+};
+
+
+User.prototype.getJSON = function(includeAttrs=[]) {
+    var UsersKeys = Object.keys(this.toJSON());
+    var result={};
+    UsersKeys = UsersKeys.filter((key)=>{
+        return includeAttrs.includes(key);
+    })
+
+    UsersKeys.forEach((key)=>{
+        result[key]=this.get(key);
+    })
+    return result;
 };
 
 

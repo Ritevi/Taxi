@@ -20,12 +20,17 @@ CustomError.prototype.SeqError = function(err){
 
 CustomError.SeqInCustom = function(err){
     if(err instanceof Sequelize.DatabaseError) {
-        return new CustomError("DbError", err.parent, err.message);
+        return new CustomError("DbError", err.parent,500, err.message);
     } else if(err instanceof Sequelize.ValidationError) {
         return new CustomError("AuthError", "VALIDATION").SeqError(err);
     } else {
         return err;
     }
+};
+
+CustomError.prototype.toJSON = function(){
+    let {name,code,status,message} = this;
+    return {name,code,status,message};
 };
 
 

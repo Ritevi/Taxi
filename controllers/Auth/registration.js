@@ -1,5 +1,5 @@
-var User = require('../models/User').User;
-const error = require('../libs/Error');
+var User = require('../../models/User').User;
+const error = require('../../libs/Error');
 
 exports.get = function (req,res) {
     res.render('register');

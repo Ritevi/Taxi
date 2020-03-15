@@ -2,12 +2,12 @@ var express = require('express');
 var router = express.Router();
 var passport = require('../libs/passport');
 
-router.get('/register',require('../controllers/registration').get);
-router.post('/register',require('../controllers/registration').post);
+router.get('/register',require('../controllers/Auth/registration').get);
+router.post('/register',require('../controllers/Auth/registration').post);
 
-router.post('/logout',require('../controllers/logout').post);
+router.post('/logout',require('../controllers/Auth/logout').post);
 
-router.post('/login',require('../controllers/login').post);
+router.post('/login',require('../controllers/Auth/login').post);
 
 router.get('/auth/vkontakte',
     passport.authenticate('vkontakte'),
