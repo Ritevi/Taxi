@@ -3,15 +3,17 @@
   "env": "development",
   "JWT": "secret",
   "secret": "hi,ksta",
-  "Auth": {
-    "VKONTAKTE_APP_ID": 7356234,
-    "VKONTAKTE_APP_SECRET":"DeuhgWF1SMKKRYipvXfd"
+  "VKontakteStrategy": {
+    "clientID": 7356234,
+    "clientSecret":"DeuhgWF1SMKKRYipvXfd",
+    "callbackURL":  "http://localhost:3000/auth/vkontakte/callback"
   },
   "sequelize": {
     "dialect": "mysql",
     "host": "localhost",
     "user": "root",
     "database": "Taxi",
-    "password": "LJxiP:p0"
+    "password": "LJxiP:p0",
+    "charset": "utf8"
   }
 }

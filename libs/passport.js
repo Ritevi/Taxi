@@ -12,11 +12,7 @@ passport.deserializeUser(function(user, done) {
     done(null, user);
 });
 
-passport.use(new VKontakteStrategy({
-        clientID:     config.get("Auth:VKONTAKTE_APP_ID"), // VK.com docs call it 'API ID', 'app_id', 'api_id', 'client_id' or 'apiId'
-        clientSecret: config.get("Auth:VKONTAKTE_APP_SECRET"),
-        callbackURL:  "http://localhost:3000/auth/vkontakte/callback"
-    },
+passport.use(new VKontakteStrategy(config.get("VKontakteStrategy"),
     function(accessToken, refreshToken, params, profile, done) {
         User.findOrCreateByVK(profile)
             .then((user)=>{

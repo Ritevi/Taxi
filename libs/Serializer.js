@@ -22,7 +22,7 @@ var Serializer = async function (instance,options = {}) {
             let othersAttr = allAttr;
             othersAttr.filter((attr)=>{
                 return exclude.includes(attr);
-            })
+            });
             for(let attr in othersAttr){
                 result[attr]=instance.get(attr);
             }

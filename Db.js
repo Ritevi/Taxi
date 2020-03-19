@@ -16,8 +16,6 @@ var foo = async function(){
     await room.setUsers(user.id,{transaction:t});
 
     t.commit();
-    let err = new error("her","zal").toJSON();
-    console.log(err);
 
 };
 

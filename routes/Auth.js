@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var passport = require('../libs/passport');
+var passport = require('passport');
 
 router.get('/register',require('../controllers/Auth/registration').get);
 router.post('/register',require('../controllers/Auth/registration').post);

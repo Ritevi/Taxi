@@ -15,9 +15,6 @@ User.init({
     username:{
         type:Sequelize.STRING(64)
     },
-    displayName:{
-        type:Sequelize.STRING(64)
-    },
     password:{
         type:Sequelize.STRING(64),
         validate:{
@@ -126,7 +123,7 @@ User.findOrCreateByVK = async function(profile){
                 },
             defaults:{
                 vkId:profile.id,
-                displayName:profile.displayName,
+                username:profile.displayName,
                 PhotoUrl:profile.photos[0].value
             },transaction});
         if(user){
@@ -147,11 +144,11 @@ User.prototype.getJSON = function(includeAttrs=[]) {
     var result={};
     UsersKeys = UsersKeys.filter((key)=>{
         return includeAttrs.includes(key);
-    })
+    });
 
     UsersKeys.forEach((key)=>{
         result[key]=this.get(key);
-    })
+    });
     return result;
 };
 
