@@ -46,6 +46,9 @@ User.init({
     timestamps: false
 });
 
+User.visibleAttr = ["username","id","PhotoUrl","vkId"];
+
+
 User.generateHash = function(password,cb){
     bcrypt.genSalt(10, function(err, salt) {
         bcrypt.hash(password, salt, cb);
@@ -139,7 +142,8 @@ User.findOrCreateByVK = async function(profile){
 };
 
 
-User.prototype.getJSON = function(includeAttrs=[]) {
+User.prototype.getJSON = function(Attrs=User.visibleAttr) {
+    const includeAttrs = Attrs||User.visibleAttr;
     var UsersKeys = Object.keys(this.toJSON());
     var result={};
     UsersKeys = UsersKeys.filter((key)=>{
@@ -150,6 +154,16 @@ User.prototype.getJSON = function(includeAttrs=[]) {
         result[key]=this.get(key);
     });
     return result;
+};
+
+User.getUserById = async function(id){
+    try {
+        const user = await User.findOne({where:{id}});
+        if(!user) throw new CustomError("Auth","NO_USER",401);
+        return user;
+    } catch (err) {
+        throw new CustomError.SeqInCustom(err);
+    }
 };
 
 

@@ -6,7 +6,8 @@
   "VKontakteStrategy": {
     "clientID": 7356234,
     "clientSecret":"DeuhgWF1SMKKRYipvXfd",
-    "callbackURL":  "http://localhost:3000/auth/vkontakte/callback"
+    "callbackURL":  "http://localhost:3000/auth/vkontakte/callback",
+    "session": false
   },
   "sequelize": {
     "dialect": "mysql",
