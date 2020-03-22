@@ -14,6 +14,7 @@ passport.deserializeUser(function(user, done) {
 
 passport.use(new VKontakteStrategy(config.get("VKontakteStrategy"),
     function(accessToken, refreshToken, params, profile, done) {
+        console.log(accessToken, refreshToken, params, profile);
         User.findOrCreateByVK(profile)
             .then((user)=>{
                 let {vkId,displayName,id}=user;

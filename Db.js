@@ -21,9 +21,3 @@
 //
 //
 // foo();
-
-
-var request = require('request');
-
-
-request.get({})

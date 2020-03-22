@@ -133,9 +133,10 @@ Room.unsubscribe = async function(roomId,userId){
 };
 
 
-Room.deleteRoom = async function(roomId){
+Room.deleteRoom = async function(roomId,userId){
   try{
       const room = await Room.findRoom(roomId);
+      if(room.getOwners())
       room.destroy();
       return room;
   } catch (err) {
