@@ -9,6 +9,7 @@ function CustomError(name,code,status,message,) {
     this.status = status||500;
     this.message = message||[name,code].join(" ");
 }
+
 util.inherits(CustomError, Error);
 
 CustomError.prototype.SeqError = function(err){
@@ -19,10 +20,15 @@ CustomError.prototype.SeqError = function(err){
 };
 
 CustomError.SeqInCustom = function(err){
+    var newErr;
     if(err instanceof Sequelize.DatabaseError) {
-        return new CustomError("DbError", err.parent,500, err.message);
+        newErr =  new CustomError("DbError", err.original.code,500); //FIX
+        newErr.stack = err.stack;
+        return newErr
     } else if(err instanceof Sequelize.ValidationError) {
-        return new CustomError("AuthError", "VALIDATION").SeqError(err);
+        newErr =  new CustomError("AuthError", "VALIDATION",401).SeqError(err);
+        newErr.stack = err.stack;
+        return newErr
     } else {
         return err;
     }

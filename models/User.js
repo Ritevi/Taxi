@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('../libs/sequelize');
 const bcrypt = require("bcrypt");
 const CustomError = require('../libs/Error');
+const jwt = require('jsonwebtoken');
 
 class User extends Sequelize.Model {}
 
@@ -96,7 +97,7 @@ User.Registration = async function(username,password,email) {
         }
     } catch (err) {
         t.rollback();
-        throw new CustomError.SeqInCustom(err);
+        throw CustomError.SeqInCustom(err);
     }
 };
 
@@ -113,7 +114,7 @@ User.login = async function(email,password){
             throw new CustomError("AuthError", "NO_USER");
         }
     } catch (err) {
-        throw new CustomError.SeqInCustom(err);
+        throw CustomError.SeqInCustom(err);
     }
 };
 
@@ -137,13 +138,16 @@ User.findOrCreateByVK = async function(profile){
         }
     }catch (err) {
         if(transaction) transaction.rollback();
-        throw new CustomError.SeqInCustom(err);
+        throw CustomError.SeqInCustom(err);
     }
 };
 
 
 User.prototype.getJSON = function(Attrs=User.visibleAttr) {
-    const includeAttrs = Attrs||User.visibleAttr;
+    if(Attrs){
+        Attrs = User.visibleAttr;
+    }
+    const includeAttrs = Attrs;
     var UsersKeys = Object.keys(this.toJSON());
     var result={};
     UsersKeys = UsersKeys.filter((key)=>{
@@ -162,9 +166,8 @@ User.getUserById = async function(id){
         if(!user) throw new CustomError("Auth","NO_USER",401);
         return user;
     } catch (err) {
-        throw new CustomError.SeqInCustom(err);
+        throw CustomError.SeqInCustom(err);
     }
 };
-
 
 exports.User = User;

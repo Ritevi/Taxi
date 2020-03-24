@@ -1,9 +1,9 @@
 //
 // var sequelize = require('./libs/sequelize');
-// const User = require('./models/User').User;
-// const Room = require('./models/Room').Room;
-// const UsersRoom = require('./models/UsersRoom').UsersRoom;
-// const Subscribe = require('./models/Subscribe').Subscribe;
+const User = require('./models/User').User;
+const Room = require('./models/Room').Room;
+const UsersRoom = require('./models/UsersRoom').UsersRoom;
+const Subscribe = require('./models/Subscribe').Subscribe;
 // const error = require('./libs/Error');
 //
 // var foo = async function(){
@@ -21,3 +21,14 @@
 //
 //
 // foo();
+
+
+Room.findOne({where:{id:25}}).then((room)=>{
+    room.getJSON().then((rooom)=>{
+        console.log(rooom);
+    })
+})
+//
+// User.findOne({where:{id:1}}).then((user)=>{
+//     console.log(user.getJSON());
+// })

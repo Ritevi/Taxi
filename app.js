@@ -6,12 +6,12 @@ const logger = require('morgan');
 const session = require('express-session');
 const sequelize = require('./libs/sequelize');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const loadUser = require('./middleware/loadUser');
 const config = require('./config');
 const passport = require('./libs/passport');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/Auth');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/Auth');
+const roomApiRouter = require('./routes/RoomApi');
 
 var app = express();
 
@@ -31,26 +31,20 @@ app.set('view engine', 'ejs');
 
 
 app.use(logger('dev'));
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-  secret:config.get('secret'),
-  store: new SequelizeStore({
-    db: sequelize
-  })
-}));
 
 sequelize.sync({force:true});
 
-app.use(loadUser);
 app.use(passport.initialize());
-app.use(passport.session());
+
 
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);
+app.use("/api",roomApiRouter);
 
 
 
@@ -67,7 +61,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render("error");
 });
 
 module.exports = app;

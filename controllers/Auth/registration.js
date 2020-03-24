@@ -1,5 +1,6 @@
 var User = require('../../models/User').User;
 const error = require('../../libs/Error');
+const AuthService = require("../../libs/AuthService");
 
 exports.get = function (req,res) {
     res.render('register');
@@ -13,11 +14,9 @@ exports.post = function (req,res,next) {
     User.Registration(username,password,email)
         .then((user)=>{
             if(user){
-                req.session.passport = {user};
-                res.status(200);
-                res.send();
+                res.json({user:{...user.getJSON(),token:AuthService.generateToken(user.getJSON())}});
             } else {
-                next(new error("AuthError","REGISTRATION"));
+                next(new error("AuthError","REGISTRATION").toJSON());
             }
         })
         .catch((err)=>{

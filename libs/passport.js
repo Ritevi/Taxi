@@ -4,21 +4,13 @@ const User = require('../models/User').User;
 const config = require('../config');
 
 
-passport.serializeUser(function(req,user, done) {
-    done(null, user);
-});
 
-passport.deserializeUser(function(user, done) {
-    done(null, user);
-});
 
 passport.use(new VKontakteStrategy(config.get("VKontakteStrategy"),
     function(accessToken, refreshToken, params, profile, done) {
-        console.log(accessToken, refreshToken, params, profile);
         User.findOrCreateByVK(profile)
             .then((user)=>{
-                let {vkId,displayName,id}=user;
-                done(null,{vkId,displayName,id});
+                done(null,user.getJSON());
             })
             .catch((err)=>{
                 done(err,null);

@@ -19,7 +19,4 @@ UsersRoom.init({
 });
 
 
-User.belongsToMany(Room, {through: UsersRoom});
-Room.belongsToMany(User, {through: UsersRoom });
-
 exports.UsersRoom = UsersRoom;

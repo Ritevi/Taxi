@@ -1,7 +1,10 @@
 {
   "port": 3000,
   "env": "development",
-  "JWT": "secret",
+  "JWT": {
+    "secret": "sosat",
+    "expiresIn":"6h"
+  },
   "secret": "hi,ksta",
   "VKontakteStrategy": {
     "clientID": 7356234,

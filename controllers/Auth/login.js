@@ -1,5 +1,6 @@
 const User = require('../../models/User').User;
 const error = require('../../libs/Error');
+const AuthService = require("../../libs/AuthService");
 
 exports.post = function (req,res,next) {
     const password = req.body.password || '';
@@ -7,11 +8,9 @@ exports.post = function (req,res,next) {
     User.login(email,password)
         .then((user)=>{
             if(user){
-                req.session.passport.user = user;
-                res.status = 200;
-                res.send();
+                res.json({user:{...user.getJSON(),token:AuthService.generateToken(user.getJSON())}})
             } else {
-                next(new error('AuthError',"NO_USER"));
+                next(new error('AuthError',"NO_USER").toJSON());
             }
         })
         .catch((err)=>{

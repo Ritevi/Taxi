@@ -19,7 +19,4 @@ Subscribe.init({
 });
 
 
-User.belongsToMany(Room, {through: Subscribe,as: 'SubRoom'});
-Room.belongsToMany(User, {through: Subscribe,as: 'Subscriber' });
-
 exports.Subscribe = Subscribe;

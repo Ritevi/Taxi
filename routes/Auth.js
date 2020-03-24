@@ -1,11 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+const AuthService = require('../libs/AuthService');
 
-router.get('/register',require('../controllers/Auth/registration').get);
 router.post('/register',require('../controllers/Auth/registration').post);
-
-router.post('/logout',require('../controllers/Auth/logout').post);
 
 router.post('/login',require('../controllers/Auth/login').post);
 
@@ -17,10 +15,12 @@ router.get('/auth/vkontakte',
     });
 
 router.get('/auth/vkontakte/callback*',
-    passport.authenticate('vkontakte', { failureRedirect: '/login' ,session:false}),
+    passport.authenticate('vkontakte', { failureRedirect: '/login',session:false}),
     function(req, res) {
-        // Successful authentication, redirect home.
-        res.redirect('/chat');
+        res.json({user:{
+                ...req.user,
+                token:AuthService.generateToken(req.user)
+            }});
     });
 
 module.exports = router;

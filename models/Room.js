@@ -2,6 +2,8 @@ const Sequelize = require('sequelize');
 const sequelize = require('../libs/sequelize');
 const User = require('./User').User;
 const error = require('../libs/Error');
+const UsersRoom = require('./UsersRoom').UsersRoom;
+const Subscribe = require('./Subscribe').Subscribe;
 
 class Room extends Sequelize.Model {}
 
@@ -20,7 +22,7 @@ Room.init({
         type:Sequelize.INTEGER,
         defaultValue:4,
         validate:{
-            max:4 //check
+            max:5 //check
         }
     },
     StartTime:{
@@ -49,31 +51,43 @@ Room.init({
     timestamps: false
 });
 
+
+User.belongsToMany(Room, {through: UsersRoom,as: 'WillingRoom'});
+Room.belongsToMany(User, {through: UsersRoom,as: 'Willing'});
+
+User.belongsTo(Room,{allowNull:false, unique:true, as: 'OwnerRoom',constraints: false});
+Room.belongsTo(User,{allowNull:false, unique:true, as: 'Owner',constraints: false});
+
+User.belongsToMany(Room, {through: Subscribe,as: 'SubRoom'});
+Room.belongsToMany(User, {through: Subscribe,as: 'Subscriber' });
+
+
 Room.createRoom = async function(title,description,StartTime,userId){
     const t = await sequelize.transaction();
+    StartTime = +StartTime;
     try{
-        let room = await Room.create({title,description,StartTime},{transaction:t});
+        if(!userId) throw new error("Room","NO_USERID",400);
+        let room = await Room.create({title:title,description:description,StartTime:StartTime},{transaction:t});
         if(room){
-            room.addOwner(userId,{transaction:t});
-            room.addUser(userId,{transaction:t});
-            room.addSubscriber(userId,{transaction:t});
-            t.commit();
+            await room.setOwner(userId,{transaction:t});
+            await room.addWilling(userId,{transaction:t});
+            await room.addSubscriber(userId,{transaction:t});
+            await t.commit();
             return room;
         } else {
-            throw new error("Room","ROOM_NOT_CREATED");
+            throw new error("Room","ROOM_NOT_CREATED",500);
         }
-
     } catch (e) {
         t.rollback();
-        throw new error.SeqInCustom(e);
+        throw error.SeqInCustom(e);
     }
 };
 
 
-Room.prototype.getJSON = async function(Attr){
-    const UsersAttr = Attr||[];
+Room.prototype.getJSON = async function(Attr=[]){
+    const UsersAttr = Attr;
     var json = await this.toJSON();
-    json.Users = await this.getUsers().map((user)=>{return user.getJSON(UsersAttr)});
+    json.Users = await this.getWilling().map((user)=>{return user.getJSON(UsersAttr)});
     json.Subs =await this.getSubscriber().map((user)=>{return user.getJSON(UsersAttr)});
     return json;
 };
@@ -87,38 +101,38 @@ Room.findRoom = async function(roomId){
             throw new error("Room","NO_ROOM",404);
         }
     } catch (err) {
-        throw new error.SeqInCustom(err);
+        throw error.SeqInCustom(err);
     };
 };
 
 Room.join = async function(roomId,userId){
     try{
         const room = await Room.findRoom(roomId);
-        await room.addUser(userId);
+        await room.addWilling(userId);
         return room;
     } catch (err) {
-        throw new error.SeqInCustom(err);
+        throw error.SeqInCustom(err);
     }
 };
 
 Room.quit = async function(roomId,userId){
     try{
         const room = await Room.findRoom(roomId);
-        await room.removeUser(userId);
+        await room.removeWilling(userId);
         return room;
     } catch (err) {
-        throw new error.SeqInCustom(err);
+        throw error.SeqInCustom(err);
     }
 };
 
 Room.subscribe = async function(roomId,userId){
     try{
         const room = await Room.findRoom(roomId);
-        if(room.countSubscriber >room.maxSub) throw new error("Room","MAX_COUNT_OF_SUB",400);
+        if(await room.countSubscriber() >room.maxSub) throw new error("Room","MAX_COUNT_OF_SUB",400);
         await room.addSubscriber(userId);
         return room;
     } catch (err) {
-        throw new error.SeqInCustom(err);
+        throw error.SeqInCustom(err);
     }
 };
 
@@ -128,19 +142,18 @@ Room.unsubscribe = async function(roomId,userId){
         await room.removeSubscriber(userId);
         return room;
     } catch (err) {
-        throw new error.SeqInCustom(err);
+        throw error.SeqInCustom(err);
     }
 };
 
 
-Room.deleteRoom = async function(roomId,userId){
+Room.deleteRoom = async function(roomId){
   try{
       const room = await Room.findRoom(roomId);
-      if(room.getOwners())
-      room.destroy();
+      await room.destroy();
       return room;
   } catch (err) {
-      throw new error.SeqInCustom(err);
+      throw error.SeqInCustom(err);
   }
 };
 

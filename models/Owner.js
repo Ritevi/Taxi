@@ -18,7 +18,6 @@ Owner.init({
     timestamps: false
 });
 
-Room.belongsTo(User,{through:Owner,as: 'owner',constraints: false, allowNull:true, defaultValue:null});
-User.belongsTo(Room,{through:Owner,as: 'ownerRoom',constraints: false, allowNull:true, defaultValue:null});
+
 
 exports.Owner = Owner;
