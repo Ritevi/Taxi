@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const config  = require("../config");
+const Room = require('../models/Room').Room;
 
 
 class AuthService {
@@ -12,6 +13,14 @@ class AuthService {
 
     static verifyToken(token){
         return jwt.verify(token,this.signature);
+    }
+
+    static isOwner(roomId,userId){
+        Room.isOwner(roomId,userId).then((result)=>{
+            return result;
+        }).catch((err)=>{
+            return [err,false];
+        })
     }
 }
 

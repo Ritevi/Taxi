@@ -157,5 +157,20 @@ Room.deleteRoom = async function(roomId){
   }
 };
 
+Room.isOwner = async function(roomId,userId){
+    try{
+        var room = await Room.findRoom(roomId);
+        const Owner = await room.getOwner();
+        if(Owner.id == userId){
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        return error.SeqInCustom(err);
+    }
+};
+
+
 exports.Room = Room;
 
