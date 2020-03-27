@@ -1,8 +1,8 @@
-const Room = require('../../../models/Room').Room;
+const Room = require('../../models/Room').Room;
 
 exports.post = function (req,res) {
     const {roomId=null,userId=null} = req.params;
-    Room.join(roomId,userId)
+    Room.subscribe(roomId,userId)
         .then((room)=>{
             room.getJSON().then((jsonRoom)=>{
                 res.json(jsonRoom);

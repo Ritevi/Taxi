@@ -171,6 +171,15 @@ Room.isOwner = async function(roomId,userId){
     }
 };
 
+Room.getRooms = async function(limit = 10){
+    try{
+        var rooms = await Room.findAll({ limit: limit})
+    }   catch (err) {
+
+    }
+}
+
+
 
 exports.Room = Room;
 

@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const RoomController = require('../controllers/Room');
-const RoomUserController = require('../controllers/Room/User');
+const RoomUserController = require('../controllers/Room/Id/User');
 const AuthService = require('../libs/AuthService');
 
 
