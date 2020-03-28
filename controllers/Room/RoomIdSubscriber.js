@@ -10,6 +10,7 @@ exports.post = function (req, res) {
       });
     })
     .catch((err) => {
+      console.error(err);
       res.json(err).status(err.status);
     });
 };

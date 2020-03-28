@@ -4,9 +4,10 @@ exports.post = function (req, res) {
   const { title, description, StartTime, userId } = req.body;
   Room.createRoom(title, description, StartTime, userId)
     .then((room) => {
-      room.getJSON().then((jsonRoom) => {
-        res.json(jsonRoom);
-      });
+      return room.getJSON();
+    })
+    .then((jsonRoom) => {
+      res.json(jsonRoom);
     })
     .catch((err) => {
       res.json(err).status(err.status);

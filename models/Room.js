@@ -152,7 +152,7 @@ Room.quit = async function (roomId, userId) {
 Room.subscribe = async function (roomId, userId) {
   try {
     const room = await Room.findRoom(roomId);
-    if ((await room.countSubscriber()) > room.maxSub)
+    if ((await room.countSubscriber()) <= room.maxSub)
       throw new error("Room", "MAX_COUNT_OF_SUB", 400);
     await room.addSubscriber(userId);
     return room;
@@ -185,7 +185,7 @@ Room.isOwner = async function (roomId, userId) {
   try {
     const room = await Room.findRoom(roomId);
     const Owner = await room.getOwner();
-    return Owner.id === userId;
+    return Owner.id === Number(userId);
   } catch (err) {
     return error.SeqInCustom(err);
   }
@@ -210,4 +210,23 @@ Room.getRooms = async function (limit, offset, Closed = null) {
   }
 };
 
+Room.changeOwner = async function (roomId, userId) {
+  try {
+    const room = await Room.findRoom(roomId);
+    const user = await User.getUserById(roomId);
+
+    return room.getOwner();
+  } catch (err) {
+    throw error.SeqInCustom(err);
+  }
+};
+
+Room.getOwnerByRoomID = async function (roomId) {
+  try {
+    const room = await Room.findRoom(roomId);
+    return room.getOwner();
+  } catch (err) {
+    throw error.SeqInCustom(err);
+  }
+};
 exports.Room = Room;

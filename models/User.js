@@ -174,4 +174,6 @@ User.getUserById = async function (id) {
   }
 };
 
+User.prototype.hasRoom = async function () {};
+
 exports.User = User;

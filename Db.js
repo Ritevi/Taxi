@@ -2,6 +2,7 @@
 // var sequelize = require("./libs/sequelize");
 const User = require("./models/User").User;
 const Room = require("./models/Room").Room;
+const AuthService = require("./libs/AuthService");
 // const UsersRoom = require("./models/UsersRoom").UsersRoom;
 // const Subscribe = require("./models/Subscribe").Subscribe;
 // // const error = require('./libs/Error');
@@ -29,6 +30,8 @@ const Room = require("./models/Room").Room;
 // User.findOne({ where: { id: 1 } }).then((user) => {
 //   console.log(user.getJSON(""));
 // });
-Room.createRoom("asdfasd", "asdfasdf", 1585440437, 1).then((room) => {
-  console.log(room);
-});
+console.log(
+  AuthService.verifyToken(
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxMywidXNlcm5hbWUiOiJSaXRldmkyMTM0NTEifSwiaWF0IjoxNTg1NDEzOTg3LCJleHAiOjE1ODU0MzU1ODd9.BUbcvkfv4s3sMMYSJ_Ur932194sCksnSA_t6Gm86ypc"
+  )
+);
