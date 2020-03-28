@@ -1,22 +1,22 @@
-const Sequelize = require('sequelize');
-const sequelize = require('../libs/sequelize');
-const User = require('./User').User;
-const Room = require('./Room').Room;
+const Sequelize = require("sequelize");
+const sequelize = require("../libs/sequelize");
 
 class Subscribe extends Sequelize.Model {}
 
-Subscribe.init({
+Subscribe.init(
+  {
     id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-    }
-}, {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
+  },
+  {
     sequelize,
-    modelName: 'Subscribe',
-    timestamps: false
-});
-
+    modelName: "Subscribe",
+    timestamps: false,
+  }
+);
 
 exports.Subscribe = Subscribe;

@@ -1,16 +1,26 @@
-var express = require('express');
-var router = express.Router();
-const RoomController = require('../controllers/Room');
-const RoomUserController = require('../controllers/Room/Id/User');
-const AuthService = require('../libs/AuthService');
+const express = require("express");
+const router = express.Router();
+const RoomController = require("../controllers/Room/Room");
+const RoomIdController = require("../controllers/Room/RoomId");
+const RoomIdUserController = require("../controllers/Room/RoomIdUser");
+const RoomIdUserIdController = require("../controllers/Room/RoomIdUserId");
+const RoomIdSubscriberController = require("../controllers/Room/RoomIdSubscriber");
+const RoomIdSubscriberIdController = require("../controllers/Room/RoomIdSubscriberId");
+const AuthService = require("../libs/AuthService");
 
+router.get("/room", RoomController.get);
+router.post("/room", RoomController.post);
 
+router.get("/room/:roomId", RoomIdController.get);
+router.delete("/room/:roomId", RoomIdController.delete);
 
-router.get("/room/:roomId",RoomController.get);
-router.post("/room",RoomController.post);
-router.delete("/room/:roomId",RoomController.delete);
+router.post("/room/:roomId/user", RoomIdUserController.post);
+router.delete("/room/:roomId/user/:userId", RoomIdUserIdController.delete);
 
-router.post("room/:roomId/user/:userId",RoomUserController.post);
-
+router.post("/room/:roomId/subscriber", RoomIdSubscriberController.post);
+router.delete(
+  "/room/:roomId/subscriber/:userId",
+  RoomIdSubscriberIdController.delete
+);
 
 module.exports = router;
