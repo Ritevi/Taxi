@@ -1,6 +1,6 @@
 const Room = require("../../models/Room").Room;
 
-exports.get = function (req, res) {
+exports.get = function (req, res, next) {
   const roomId = req.params.roomId;
   Room.findRoom(roomId)
     .then((room) => {
@@ -9,11 +9,11 @@ exports.get = function (req, res) {
       });
     })
     .catch((err) => {
-      res.json(err);
+      next(err);
     });
 };
 
-exports.delete = function (req, res) {
+exports.delete = function (req, res, next) {
   const roomId = req.params.roomId;
   Room.deleteRoom(roomId)
     .then((room) => {
@@ -23,6 +23,6 @@ exports.delete = function (req, res) {
       });
     })
     .catch((err) => {
-      res.json(err).status(err.status);
+      next(err);
     });
 };

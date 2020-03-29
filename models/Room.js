@@ -16,10 +16,6 @@ Room.init(
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
-    uuid: {
-      type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-    },
     maxSub: {
       type: Sequelize.INTEGER,
       defaultValue: 4,
@@ -31,6 +27,10 @@ Room.init(
       type: Sequelize.DATE,
     },
     Close: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    instaInvite: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
     },
@@ -58,21 +58,31 @@ Room.init(
 User.belongsToMany(Room, { through: UsersRoom, as: "WillingRoom" });
 Room.belongsToMany(User, { through: UsersRoom, as: "Willing" });
 
-User.belongsTo(Room, {
-  allowNull: false,
-  unique: true,
-  as: "OwnerRoom",
-  constraints: false,
-});
 Room.belongsTo(User, {
-  allowNull: false,
-  unique: true,
+  foreignKey: {
+    unique: true,
+  },
   as: "Owner",
-  constraints: false,
+  hooks: true,
 });
 
-User.belongsToMany(Room, { through: Subscribe, as: "SubRoom" });
-Room.belongsToMany(User, { through: Subscribe, as: "Subscriber" });
+User.belongsToMany(Room, {
+  through: { model: Subscribe, unique: true },
+  as: "SubRoom",
+});
+Room.belongsToMany(User, {
+  through: { model: Subscribe, unique: true },
+  as: "Subscriber",
+});
+
+// Room.addHook("beforeUpdate", "changeOwner", async (room, options) => {
+//   if (options.fields.includes("OwnerId")) {
+//     const previousUserId = await room.previous().OwnerId;
+//     const user = await User.getUserById(previousUserId);
+//     const ownerRoom = await user.getOwnerRoom();
+//   }
+//   return room;
+// });
 
 Room.createRoom = async function (title, description = "", StartTime, userId) {
   const t = await sequelize.transaction();
@@ -152,9 +162,9 @@ Room.quit = async function (roomId, userId) {
 Room.subscribe = async function (roomId, userId) {
   try {
     const room = await Room.findRoom(roomId);
-    if ((await room.countSubscriber()) <= room.maxSub)
+    if ((await room.countSubscriber()) > room.maxSub)
       throw new error("Room", "MAX_COUNT_OF_SUB", 400);
-    await room.addSubscriber(userId);
+    await room.addSubscriber(userId, { through: { active: room.instaInvite } });
     return room;
   } catch (err) {
     throw error.SeqInCustom(err);
@@ -168,6 +178,15 @@ Room.unsubscribe = async function (roomId, userId) {
     return room;
   } catch (err) {
     throw error.SeqInCustom(err);
+  }
+};
+
+Room.getSubs = async function (roomId) {
+  try {
+    const room = await Room.findRoom(roomId);
+    return await room.getSubscriber();
+  } catch (e) {
+    throw error.SeqInCustom(e);
   }
 };
 
@@ -213,8 +232,7 @@ Room.getRooms = async function (limit, offset, Closed = null) {
 Room.changeOwner = async function (roomId, userId) {
   try {
     const room = await Room.findRoom(roomId);
-    const user = await User.getUserById(roomId);
-
+    await room.setOwner(userId);
     return room.getOwner();
   } catch (err) {
     throw error.SeqInCustom(err);

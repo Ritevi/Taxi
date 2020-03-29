@@ -1,16 +1,30 @@
 const Room = require("../../models/Room").Room;
 
-exports.post = function (req, res) {
+exports.post = function (req, res, next) {
   const { roomId } = req.params;
   const { userId } = req.body;
   Room.subscribe(roomId, userId)
     .then((room) => {
-      room.getJSON().then((jsonRoom) => {
-        res.json(jsonRoom);
-      });
+      return room.getJSON();
+    })
+    .then((jsonRoom) => {
+      res.json(jsonRoom);
     })
     .catch((err) => {
-      console.error(err);
-      res.json(err).status(err.status);
+      next(err);
+    });
+};
+
+exports.get = function (req, res, next) {
+  const { roomId } = req.params;
+  Room.getSubs(roomId)
+    .then((room) => {
+      return room.getJSON();
+    })
+    .then((jsonRoom) => {
+      res.json(jsonRoom);
+    })
+    .catch((err) => {
+      next(err);
     });
 };

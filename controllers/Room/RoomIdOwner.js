@@ -1,6 +1,6 @@
 const Room = require("../../models/Room").Room;
 
-exports.post = function (req, res) {
+exports.post = function (req, res, next) {
   const { roomId } = req.params;
   const { userId } = req.body;
   Room.changeOwner(roomId, userId)
@@ -11,18 +11,17 @@ exports.post = function (req, res) {
       res.json(jsonRoom);
     })
     .catch((err) => {
-      console.error(err);
-      res.json(err).status(err.status);
+      next(err);
     });
 };
 
-exports.get = function (req, res) {
+exports.get = function (req, res, next) {
   const { roomId } = req.params;
   Room.getOwnerByRoomID(roomId)
     .then((owner) => {
       res.json(owner.getJSON());
     })
     .catch((err) => {
-      res.json(err).status(err.status);
+      next(err);
     });
 };

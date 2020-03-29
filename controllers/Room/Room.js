@@ -1,6 +1,6 @@
 const Room = require("../../models/Room").Room;
 
-exports.post = function (req, res) {
+exports.post = function (req, res, next) {
   const { title, description, StartTime, userId } = req.body;
   Room.createRoom(title, description, StartTime, userId)
     .then((room) => {
@@ -10,11 +10,11 @@ exports.post = function (req, res) {
       res.json(jsonRoom);
     })
     .catch((err) => {
-      res.json(err).status(err.status);
+      next(err);
     });
 };
 
-exports.get = function (req, res) {
+exports.get = function (req, res, next) {
   const { closed, offset, limit } = req.query;
   Room.getRooms(limit, offset, closed)
     .then((rooms) => {
@@ -28,6 +28,6 @@ exports.get = function (req, res) {
       });
     })
     .catch((err) => {
-      res.json(err).status(err.status);
+      next(err);
     });
 };

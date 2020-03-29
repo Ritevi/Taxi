@@ -1,6 +1,6 @@
 const Room = require("../../models/Room").Room;
 
-exports.delete = function (req, res) {
+exports.delete = function (req, res, next) {
   const { roomId, userId } = req.params;
   Room.unsubscribe(roomId, userId)
     .then((room) => {
@@ -9,6 +9,6 @@ exports.delete = function (req, res) {
       });
     })
     .catch((err) => {
-      res.json(err).status(err.status);
+      next(err);
     });
 };

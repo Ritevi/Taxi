@@ -11,6 +11,9 @@ Subscribe.init(
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
+    active: {
+      type: Sequelize.BOOLEAN,
+    },
   },
   {
     sequelize,

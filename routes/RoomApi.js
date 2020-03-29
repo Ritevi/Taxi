@@ -27,6 +27,7 @@ router.post(
   isOwner,
   RoomIdSubscriberController.post
 );
+router.get("/room/:roomId/subscriber", RoomIdSubscriberController.get);
 router.delete(
   "/room/:roomId/subscriber/:userId",
   isOwner,
