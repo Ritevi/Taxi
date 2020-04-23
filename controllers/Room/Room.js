@@ -1,33 +1,26 @@
 const Room = require("../../models/Room").Room;
 
-exports.post = function (req, res, next) {
+exports.post = async function (req, res, next) {
   const { title, description, StartTime, userId } = req.body;
-  Room.createRoom(title, description, StartTime, userId)
-    .then((room) => {
-      return room.getJSON();
-    })
-    .then((jsonRoom) => {
-      res.json(jsonRoom);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    let room = await Room.createRoom(title, description, StartTime, userId);
+    res.json(await room.getJSON());
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.get = function (req, res, next) {
+exports.get = async function (req, res, next) {
   const { closed, offset, limit } = req.query;
-  Room.getRooms(limit, offset, closed)
-    .then((rooms) => {
-      const result = rooms.map((room) => {
-        return room.getJSON().then((jsonRoom) => {
-          return jsonRoom;
-        });
-      });
-      Promise.all(result).then((result) => {
-        res.json(result);
-      });
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    let rooms = await Room.getRooms(limit, offset, closed);
+    let result = await Promise.all(
+      rooms.map(async (room) => {
+        return room.getJSON();
+      })
+    );
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
 };

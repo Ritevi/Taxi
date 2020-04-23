@@ -1,28 +1,21 @@
 const Room = require("../../models/Room").Room;
 
-exports.get = function (req, res, next) {
+exports.get = async function (req, res, next) {
   const roomId = req.params.roomId;
-  Room.findRoom(roomId)
-    .then((room) => {
-      room.getJSON().then((jsonRoom) => {
-        res.json(jsonRoom);
-      });
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    let room = await Room.findRoom(roomId);
+    res.json(await room.getJSON());
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.delete = function (req, res, next) {
+exports.delete = async function (req, res, next) {
   const roomId = req.params.roomId;
-  Room.deleteRoom(roomId)
-    .then((room) => {
-      console.log(room);
-      room.getJSON().then((room) => {
-        res.json(room);
-      });
-    })
-    .catch((err) => {
-      next(err);
-    });
+  try {
+    let room = await Room.deleteRoom(roomId);
+    res.json(await room.getJSON());
+  } catch (err) {
+    next(err);
+  }
 };

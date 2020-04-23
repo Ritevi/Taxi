@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require("../libs/sequelize");
 const User = require("./User").User;
 const error = require("../libs/Error");
-const UsersRoom = require("./UsersRoom").UsersRoom;
+const inviteToRoom = require("./InviteToRoom").inviteToRoom;
 const Subscribe = require("./Subscribe").Subscribe;
 const { Op } = require("sequelize");
 
@@ -55,8 +55,8 @@ Room.init(
   }
 );
 
-User.belongsToMany(Room, { through: UsersRoom, as: "WillingRoom" });
-Room.belongsToMany(User, { through: UsersRoom, as: "Willing" });
+User.belongsToMany(Room, { through: inviteToRoom, as: "InviteRoom" });
+Room.belongsToMany(User, { through: inviteToRoom, as: "InviteUser" });
 
 Room.belongsTo(User, {
   foreignKey: {
@@ -75,15 +75,6 @@ Room.belongsToMany(User, {
   as: "Subscriber",
 });
 
-// Room.addHook("beforeUpdate", "changeOwner", async (room, options) => {
-//   if (options.fields.includes("OwnerId")) {
-//     const previousUserId = await room.previous().OwnerId;
-//     const user = await User.getUserById(previousUserId);
-//     const ownerRoom = await user.getOwnerRoom();
-//   }
-//   return room;
-// });
-
 Room.createRoom = async function (title, description = "", StartTime, userId) {
   const t = await sequelize.transaction();
   StartTime = +StartTime;
@@ -101,7 +92,7 @@ Room.createRoom = async function (title, description = "", StartTime, userId) {
     );
     if (room) {
       await room.setOwner(userId, { transaction: t });
-      await room.addWilling(userId, { transaction: t });
+      await room.addInviteUser(userId, { transaction: t });
       await room.addSubscriber(userId, { transaction: t });
       await t.commit();
       return room;
@@ -117,7 +108,7 @@ Room.createRoom = async function (title, description = "", StartTime, userId) {
 Room.prototype.getJSON = async function (Attr = []) {
   const UsersAttr = Attr;
   const json = await this.toJSON();
-  json.Users = await this.getWilling().map((user) => {
+  json.Users = await this.getInviteUser().map((user) => {
     return user.getJSON(UsersAttr);
   });
   json.Subs = await this.getSubscriber().map((user) => {
@@ -139,21 +130,30 @@ Room.findRoom = async function (roomId) {
   }
 };
 
-Room.join = async function (roomId, userId) {
+Room.Invite = async function (roomId, userId) {
   try {
     const room = await Room.findRoom(roomId);
-    await room.addWilling(userId);
-    return room;
+    await room.addInviteUser(userId);
+    return await User.getUserById(userId);
   } catch (err) {
     throw error.SeqInCustom(err);
   }
 };
 
-Room.quit = async function (roomId, userId) {
+Room.RemoveInvite = async function (roomId, userId) {
   try {
     const room = await Room.findRoom(roomId);
-    await room.removeWilling(userId);
-    return room;
+    await room.removeInviteUser(userId);
+    return await User.getUserById(userId);
+  } catch (err) {
+    throw error.SeqInCustom(err);
+  }
+};
+
+Room.getInvites = async function (roomId) {
+  try {
+    const room = await Room.findRoom(roomId);
+    return await room.getInviteUser();
   } catch (err) {
     throw error.SeqInCustom(err);
   }
@@ -164,8 +164,8 @@ Room.subscribe = async function (roomId, userId) {
     const room = await Room.findRoom(roomId);
     if ((await room.countSubscriber()) > room.maxSub)
       throw new error("Room", "MAX_COUNT_OF_SUB", 400);
-    await room.addSubscriber(userId, { through: { active: room.instaInvite } });
-    return room;
+    await room.addSubscriber(userId);
+    return await User.getUserById(userId);
   } catch (err) {
     throw error.SeqInCustom(err);
   }
@@ -175,7 +175,7 @@ Room.unsubscribe = async function (roomId, userId) {
   try {
     const room = await Room.findRoom(roomId);
     await room.removeSubscriber(userId);
-    return room;
+    return await User.getUserById(userId);
   } catch (err) {
     throw error.SeqInCustom(err);
   }
@@ -247,4 +247,5 @@ Room.getOwnerByRoomID = async function (roomId) {
     throw error.SeqInCustom(err);
   }
 };
+
 exports.Room = Room;

@@ -1,11 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../libs/sequelize");
-const User = require("./User").User;
-const Room = require("./Room").Room;
 
-class Owner extends Sequelize.Model {}
+class InviteToRoom extends Sequelize.Model {}
 
-Owner.init(
+InviteToRoom.init(
   {
     id: {
       allowNull: false,
@@ -16,9 +14,9 @@ Owner.init(
   },
   {
     sequelize,
-    modelName: "Owner",
+    modelName: "InviteToRoom",
     timestamps: false,
   }
 );
 
-exports.Owner = Owner;
+exports.inviteToRoom = InviteToRoom;

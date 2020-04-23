@@ -3,9 +3,7 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const session = require("express-session");
 const sequelize = require("./libs/sequelize");
-const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const config = require("./config");
 const passport = require("./libs/passport");
 
